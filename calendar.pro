@@ -1,6 +1,14 @@
 TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
-CONFIG -= qt
+CONFIG += qt
+CONFIG += sql
 
-SOURCES += main.cpp
+SOURCES += src/main.cpp \
+    src/main.cpp
+
+SUBDIRS += \
+    calendar.pro
+
+DISTFILES += \
+    README.md
