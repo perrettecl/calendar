@@ -4,8 +4,7 @@ CONFIG -= app_bundle
 CONFIG += qt
 CONFIG += sql
 
-SOURCES += src/main.cpp \
-    src/main.cpp
+SOURCES += src/main.cpp
 
 SUBDIRS += \
     calendar.pro
