@@ -4,10 +4,14 @@ CONFIG -= app_bundle
 CONFIG += qt
 CONFIG += sql
 
-SOURCES += src/main.cpp
+SOURCES += src/main.cpp \
+    src/dbmanager.cpp
 
 SUBDIRS += \
     calendar.pro
 
 DISTFILES += \
     README.md
+
+HEADERS += \
+    src/dbmanager.h
