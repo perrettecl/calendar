@@ -1,6 +1,6 @@
 #include "dbmanager.h"
 #include <iostream>
-#include <QtSql/QSqlDatabase>
+DbManager* DbManager::instance;
 
 DbManager::DbManager()
 {
@@ -18,10 +18,11 @@ DbManager::DbManager()
 
 DbManager* DbManager::getInstance()
 {
-    if(!instance)
+
+    if(!DbManager::instance)
     {
-        instance = new DbManager();
+        DbManager::instance = new DbManager();
     }
 
-    return instance;
+    return DbManager::instance;
 }

@@ -21,4 +21,5 @@ private:
 
 };
 
+
 #endif // DBMANAGER_H
