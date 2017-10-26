@@ -1,11 +1,11 @@
 #include "dbmanager.h"
 #include <iostream>
-DbManager* DbManager::instance;
+DbManager* DbManager::m_instance = NULL;
 
 DbManager::DbManager()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName("/home/jarmila/calendar/database/calendar.db");
+    m_db.setDatabaseName("C:\\Users\\gabri\\Documents\\calendar\\database\\calendar.db");
     if (!m_db.open())
       {
          std::cerr << "Error: connection with database fail" << std::endl;
@@ -19,10 +19,16 @@ DbManager::DbManager()
 DbManager* DbManager::getInstance()
 {
 
-    if(!DbManager::instance)
+    if(!DbManager::m_instance)
     {
-        DbManager::instance = new DbManager();
+        DbManager::m_instance = new DbManager();
     }
 
-    return DbManager::instance;
+    return DbManager::m_instance;
+}
+
+QSqlQuery DbManager::execQuery(const std::string& query)
+{
+    DbManager* db = getInstance();
+    return db->m_db.exec(QString::fromStdString(query));
 }
