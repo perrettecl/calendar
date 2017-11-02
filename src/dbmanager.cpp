@@ -5,7 +5,7 @@ DbManager* DbManager::m_instance = NULL;
 DbManager::DbManager()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName("C:\\Users\\gabri\\Documents\\calendar\\database\\calendar.db");
+    m_db.setDatabaseName("calendar.db");
     if (!m_db.open())
       {
          std::cerr << "Error: connection with database fail" << std::endl;

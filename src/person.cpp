@@ -1,6 +1,7 @@
 #include "person.h"
 #include "dbmanager.h"
 #include <QSqlQuery>
+#include <QVariant>
 #include <iostream>
 
 Person::Person()
@@ -11,7 +12,7 @@ Person::Person()
 void Person::printAll()
 {
     QSqlQuery query;
-    query = DbManager::execQuery("SELECT * FROM person");
+    query = DbManager::execQuery("SELECT * FROM PERSON");
     while (query.next())
     {
         int indexPerson = query.value(0).toInt();
