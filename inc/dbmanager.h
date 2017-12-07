@@ -1,7 +1,7 @@
 #ifndef DBMANAGER_H
 #define DBMANAGER_H
-//#include <QtSql/QSqlDatabase>
-//#include <QSqlQuery>
+
+#include "sqlite3.h"
 
 class DbManager;
 class DbManager
@@ -9,7 +9,7 @@ class DbManager
 //------------- Variables
 private:
     static DbManager* m_instance;
-    //QSqlDatabase m_db;
+	sqlite3 *m_db;
 
 //------------- Functions
 

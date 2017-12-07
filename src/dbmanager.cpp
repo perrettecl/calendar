@@ -1,5 +1,3 @@
-//#include <QSqlError>
-//#include <QFile>
 #include "dbmanager.h"
 #include <iostream>
 #include <exception>
@@ -7,17 +5,17 @@ DbManager* DbManager::m_instance = NULL;
 
 DbManager::DbManager()
 {
-//    m_db = QSqlDatabase::addDatabase("QSQLITE");
-//    if(!QFile::exists("../calendar/database/calendar.db"))
-//    {
-//        throw std::runtime_error("Error: connection with database fail, the file doesn't exist");
-//    }
 
-//    m_db.setDatabaseName("../calendar/database/calendar.db");
-//    if (!m_db.open())
-//    {
-//         throw std::runtime_error("Error: connection with database fail");
-//    }
+	int returnCode;
+	//try to open the database
+    returnCode = sqlite3_open("../calendar/database/calendar.db", &m_db);
+
+	//check if it's open
+	if (returnCode)
+    {
+       throw std::runtime_error("Error: connection with database fail");
+    }
+
 }
 
 DbManager* DbManager::getInstance()
