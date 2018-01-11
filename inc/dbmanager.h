@@ -16,6 +16,7 @@ private:
 
 public:
     static DbManager* getInstance();
+    static sqlite3* getConnector();
     static void execQuery(const std::string& query);
 
 private:

@@ -19,6 +19,11 @@ DbManager::DbManager()
 
 }
 
+sqlite3* DbManager::getConnector()
+{
+	return getInstance()->m_db;
+}
+
 DbManager* DbManager::getInstance()
 {
 
@@ -54,7 +59,7 @@ void DbManager::execQuery(const std::string& query)
 	}
 
 	while ((rc = sqlite3_step(res)) == SQLITE_ROW)
-	{                                              /* 2 */
+	{                                              
 		std::cout << sqlite3_column_int(res, 0) << std::endl;
 	}
 
