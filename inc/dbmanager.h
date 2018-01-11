@@ -2,6 +2,7 @@
 #define DBMANAGER_H
 
 #include "sqlite3.h"
+#include <string>
 
 class DbManager;
 class DbManager
@@ -15,7 +16,8 @@ private:
 
 public:
     static DbManager* getInstance();
-    //static QSqlQuery execQuery(const std::string& query);
+    static void execQuery(const std::string& query);
+
 private:
     DbManager();
     DbManager(DbManager const&) =delete;

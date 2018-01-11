@@ -1,12 +1,12 @@
 #include <iostream>
 #include "dbmanager.h"
 
-using namespace std;
 
 int main()//(int argc, char *argv[])
 {
-    cout << "Hello World!" << endl;
-	DbManager::getInstance();
-
-    return 0;
+	std::cout << "Hello World!" << std::endl;
+	DbManager::execQuery(" SELECT * FROM Event");
+	char test;
+	std::cin >> test;
+	return 0;
 }
