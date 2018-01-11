@@ -1,11 +1,11 @@
 #include <iostream>
-#include "dbmanager.h"
+#include "person.h"
 
 
 int main()//(int argc, char *argv[])
 {
 	std::cout << "Hello World!" << std::endl;
-	DbManager::execQuery(" SELECT * FROM Event");
+	Person::printAll();
 	char test;
 	std::cin >> test;
 	return 0;
