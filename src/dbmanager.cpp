@@ -9,7 +9,7 @@ DbManager::DbManager()
 	int returnCode;
 
 	//try to open the database
-    returnCode = sqlite3_open("../database/calendar.db", &m_db);
+    returnCode = sqlite3_open("./database/calendar.db", &m_db);
 
 	//check if it's open
 	if (returnCode)
