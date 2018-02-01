@@ -26,6 +26,7 @@ void Person::read(IdPerson id)
 
   if (returnCode != SQLITE_OK)
   {
+    sqlite3_finalize(statement);
     throw std::runtime_error("Error: prepare statement failed!");
   }
   
@@ -58,7 +59,91 @@ void Person::read(IdPerson id)
 /*--------------------------------------------------------------------*/
 void Person::write()
 {
+  if (m_id == 0) // insert
+  {
+    insert();
+  }
+  else // update
+  {
+    update();
+  }
+  
+
 }
+/*--------------------------------------------------------------------*/
+void Person::insert()
+{
+  //INSERT INTO person (name) VALUES ("Gabriela")
+  //get the database instance
+  sqlite3 *db = DbManager::getConnector();
+
+  //create sql statement
+  sqlite3_stmt *statement;
+  const char* sqlQuery = "INSERT INTO person (name) VALUES (?)";
+  int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
+
+  if (returnCode != SQLITE_OK)
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: prepare statement failed!");
+  }
+  
+  //fill the statement with the name
+  sqlite3_bind_text(statement, 1, m_name.c_str(), m_name.length(),SQLITE_STATIC);
+  
+  //insert the person
+  returnCode = sqlite3_step(statement);
+  
+  //if insert a person is successfull we get the id
+  if( returnCode == SQLITE_DONE)
+  {  
+    //get the id                                            
+    m_id = sqlite3_last_insert_rowid(db);
+  }
+  else
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: impossible to add the person: "+ m_name +"!");
+  }
+  
+  sqlite3_finalize(statement);
+}
+/*--------------------------------------------------------------------*/
+void Person::update()
+{
+  //UPDATE person SET name = "Clément" WHERE person.idPerson = 2; 
+  //get the database instance
+  sqlite3 *db = DbManager::getConnector();
+
+  //create sql statement
+  sqlite3_stmt *statement;
+  const char* sqlQuery = "UPDATE person SET name = ? WHERE person.idPerson = ?";
+  int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
+
+  if (returnCode != SQLITE_OK)
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: prepare statement failed!");
+  }
+  
+  //fill the statement with the name 
+  sqlite3_bind_text(statement, 1, m_name.c_str(), m_name.length(),SQLITE_STATIC);
+  //fill the statement with the idPerson 
+  sqlite3_bind_int(statement, 2, m_id);
+  
+  //insert the person
+  returnCode = sqlite3_step(statement);
+  
+  //if we can't update
+  if( returnCode != SQLITE_DONE)
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: impossible to add the person: "+ m_name +"!");
+  }
+  
+  sqlite3_finalize(statement);
+}
+
 /*--------------------------------------------------------------------*/
 IdPerson Person::getId() const
 {

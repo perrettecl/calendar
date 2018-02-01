@@ -53,6 +53,10 @@
     NamePerson getName() const;
     void setName(const NamePerson & name);
     
+  private:
+    void insert(); ///called by write to insert
+    void update(); ///called by write to update
+
     
     
     
