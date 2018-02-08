@@ -67,8 +67,44 @@ void Person::write()
   {
     update();
   }
-  
+}
+/*--------------------------------------------------------------------*/
+void Person::erase()
+{
+  if (m_id != 0)
+  {
+    //DELETE FROM person WHERE person.idPerson = 2; 
+    //get the database instance
+    sqlite3 *db = DbManager::getConnector();
 
+    //create sql statement
+    sqlite3_stmt *statement;
+    const char* sqlQuery = "DELETE FROM person WHERE person.idPerson = ?";
+    int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
+
+    if (returnCode != SQLITE_OK)
+    {
+      sqlite3_finalize(statement);
+      throw std::runtime_error("Error: prepare statement failed!");
+    }
+    
+    //fill the statement with the idPerson 
+    sqlite3_bind_int(statement, 1, m_id);
+    
+    //delete the person
+    returnCode = sqlite3_step(statement);
+    
+    //if we can't delete
+    if( returnCode != SQLITE_DONE)
+    {
+      sqlite3_finalize(statement);
+      throw std::runtime_error("Error: impossible to delete the person with the ID: "+ std::to_string(m_id) +"!");
+    }
+    
+    sqlite3_finalize(statement);
+    
+    m_id = 0;
+  }
 }
 /*--------------------------------------------------------------------*/
 void Person::insert()

@@ -47,6 +47,10 @@
      * we insert the person, otherwise we update the field
      */
     void write();
+    /**
+     * @brief erase a person from the database.
+     */
+    void erase();
     
     IdPerson getId() const;
     
