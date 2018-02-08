@@ -1,12 +1,15 @@
 #include <iostream>
 #include "person.h"
 
-using namespace std;
 
 int main()//(int argc, char *argv[])
 {
-    cout << "Hello World!" << endl;
+    std::cout << "Hello World!" << std::endl;
     Person::printAll();
-
+    Person person(1);
+    std::cout << person.getName() << std::endl;
+    std::cout << person;
+    char test;
+    std::cin >> test;
     return 0;
 }

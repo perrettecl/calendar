@@ -1,23 +1,27 @@
-#include <QSqlError>
-#include <QFile>
 #include "dbmanager.h"
 #include <iostream>
 #include <exception>
+
 DbManager* DbManager::m_instance = NULL;
 
 DbManager::DbManager()
 {
-    m_db = QSqlDatabase::addDatabase("QSQLITE");
-    if(!QFile::exists("../calendar/database/calendar.db"))
+	int returnCode;
+
+	//try to open the database
+    returnCode = sqlite3_open("./database/calendar.db", &m_db);
+
+	//check if it's open
+	if (returnCode)
     {
-        throw std::runtime_error("Error: connection with database fail, the file doesn't exist");
+       throw std::runtime_error("Error: connection with database failed!");
     }
 
-    m_db.setDatabaseName("../calendar/database/calendar.db");
-    if (!m_db.open())
-    {
-         throw std::runtime_error("Error: connection with database fail");
-    }
+}
+
+sqlite3* DbManager::getConnector()
+{
+	return getInstance()->m_db;
 }
 
 DbManager* DbManager::getInstance()
@@ -31,9 +35,34 @@ DbManager* DbManager::getInstance()
     return DbManager::m_instance;
 }
 
-QSqlQuery DbManager::execQuery(const std::string& query)
+void DbManager::execQuery(const std::string& query)
 {
-    DbManager* db = getInstance();
-    QSqlQuery result = db->m_db.exec(QString::fromStdString(query));
-    return result;
+	//get the database instance
+	sqlite3 *db = getInstance()->m_db;
+
+	//create sql statement
+	sqlite3_stmt *res;
+
+	int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &res, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		throw std::runtime_error("Error: prepare statement failed!");
+	}
+
+	//read the answer
+	rc = sqlite3_step(res);
+
+	if (rc == SQLITE_ROW)
+	{
+		std::cout << sqlite3_column_text(res, 0) << std::endl;
+	}
+
+	while ((rc = sqlite3_step(res)) == SQLITE_ROW)
+	{                                              
+		std::cout << sqlite3_column_int(res, 0) << std::endl;
+	}
+
+	//remove the statement
+	sqlite3_finalize(res);
 }
