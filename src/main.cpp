@@ -11,6 +11,9 @@ int main()//(int argc, char *argv[])
     std::cout << person2;
     person2.setName("Gabriela");
     person2.write();
+    person2.erase();
+    Person::printAll();
+    person2.write();
     Person::printAll();
     
     char test;

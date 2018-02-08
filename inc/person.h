@@ -13,6 +13,8 @@
 //some types
   typedef int IdPerson;
   typedef std::string NamePerson;
+  typedef std::string SurnamePerson;
+  typedef std::string EmailPerson;
 /*--------------------------------------------------------------------*/
   class Person
   {
@@ -20,14 +22,18 @@
   private:
     IdPerson m_id;
     NamePerson m_name;
+    SurnamePerson m_surname;
+    EmailPerson m_email;
 
 //object methodes
   public:
     /**
      * @brief Create a new person. This person isn't add to the database.
      * @param in: name of the person
+     * @param in: surname of the person
+     * @param in: email of the person
      */
-    Person(const NamePerson & name);
+    Person(const NamePerson & name, const SurnamePerson & surname, const EmailPerson & email);
     
     /**
      * @brief Load a person from the database
@@ -37,11 +43,26 @@
     Person(IdPerson id);
     
     /**
+     * @brief Load a person from the database
+     * @param in: email of the person in the database
+     * @exception runtime_error when the id doesn't exist
+     */
+    Person(const EmailPerson & email);
+    
+    /**
      * @brief read a person from the database and store it in the object
      * @param in: id of the person in the database
      * @exception runtime_error when the id doesn't exist
      */
     void read(IdPerson id);
+    
+    /**
+     * @brief read a person from the database and store it in the object
+     * @param in: email of the person in the database
+     * @exception runtime_error when the id doesn't exist
+     */
+    void read(const EmailPerson & email);
+    
     /**
      * @brief write a person into the database. If the id is empty, 
      * we insert the person, otherwise we update the field
@@ -56,6 +77,12 @@
     
     NamePerson getName() const;
     void setName(const NamePerson & name);
+    
+    SurnamePerson getSurname() const;
+    void setSurname(const SurnamePerson & surname);
+    
+    EmailPerson getEmail() const;
+    void setEmail(const EmailPerson & email);
     
   private:
     void insert(); ///called by write to insert

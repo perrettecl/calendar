@@ -3,8 +3,9 @@
 #include <iostream>
 #include <sstream>
 
-  Person::Person(const NamePerson & name)
-  : m_id(0), m_name(name)
+
+  Person::Person(const NamePerson & name, const SurnamePerson & surname, const EmailPerson & email)
+  : m_id(0), m_name(name), m_surname(surname), m_email(email)
   {
     
   }
@@ -12,6 +13,11 @@
   Person::Person(IdPerson id)
   {
     read(id);
+  }
+/*--------------------------------------------------------------------*/
+  Person::Person(const EmailPerson & email)
+  {
+    read(email);
   }
 /*--------------------------------------------------------------------*/
 void Person::read(IdPerson id)
@@ -51,6 +57,53 @@ void Person::read(IdPerson id)
   {
     sqlite3_finalize(statement);
     throw std::runtime_error("Error: no person found with the id: "+std::to_string(id)+"!");
+  }
+
+  //remove the statement
+  sqlite3_finalize(statement);
+}
+/*--------------------------------------------------------------------*/
+void Person::read(const EmailPerson & email)
+{
+  //get the database instance
+  sqlite3 *db = DbManager::getConnector();
+
+  //create sql statement
+  sqlite3_stmt *statement;
+  const char* sqlQuery = "SELECT person.idPerson, person.name, person.surname, person.email FROM person WHERE person.email = ?";
+  int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
+
+  if (returnCode != SQLITE_OK)
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: prepare statement failed!");
+  }
+  
+  //fill the statement with the email
+  DbManager::bind(statement, email, 1);
+  
+  //read the first answer
+  returnCode = sqlite3_step(statement);
+  
+  //if we found a person with this email
+  if( returnCode == SQLITE_ROW)
+  {  
+    //get the id     
+    m_id = DbManager::getInt(statement, 0);                                     
+    
+    //get the name
+    m_name = DbManager::getString(statement, 1); 
+    
+    //get the surname
+    m_surname = DbManager::getString(statement, 2); 
+    
+    //get the email
+    m_email = DbManager::getString(statement, 3); 
+  }
+  else
+  {
+    sqlite3_finalize(statement);
+    throw std::runtime_error("Error: no person found with the email: "+email+"!");
   }
 
   //remove the statement
