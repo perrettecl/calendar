@@ -17,13 +17,19 @@ private:
 public:
     static DbManager* getInstance();
     static sqlite3* getConnector();
-    static void execQuery(const std::string& query);
+    
+    static void bind(sqlite3_stmt * statement, const std::string & value, uint32_t position);
+    static void bind(sqlite3_stmt * statement, int value, uint32_t position);
+    
+    static std::string getString(sqlite3_stmt * statement, uint32_t position);
+    static int getInt(sqlite3_stmt * statement, uint32_t position);
 
 private:
     DbManager();
     DbManager(DbManager const&) =delete;
     DbManager& operator=(DbManager const&) =delete;
     ~DbManager()=delete;
+
 
 
 };
