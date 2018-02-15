@@ -1,5 +1,5 @@
 #include "person.h"
-#include "dbmanager.h"
+#include "sql.h"
 #include <iostream>
 #include <sstream>
 
@@ -21,51 +21,27 @@
   }
 /*--------------------------------------------------------------------*/
 void Person::read(IdPerson id)
-{
-  //get the database instance
-  sqlite3 *db = DbManager::getConnector();
-
-  //create sql statement
-  sqlite3_stmt *statement;
-  const char* sqlQuery = "SELECT person.idPerson, person.name FROM person WHERE person.idPerson = ?";
-  int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
-
-  if (returnCode != SQLITE_OK)
-  {
-    sqlite3_finalize(statement);
-    throw std::runtime_error("Error: prepare statement failed!");
-  }
+{  
+  Sql query("SELECT person.idPerson, person.name, person.surname, person.email FROM person WHERE person.idPerson = ?");
   
-  //fill the statement with the idPerson 
-  sqlite3_bind_int(statement, 1, id);
-  
-  //read the first answer
-  returnCode = sqlite3_step(statement);
+  query.bind(id, 1);
   
   //if we found a person with this id
-  if( returnCode == SQLITE_ROW)
+  if(query.execQuery())
   {  
     int index = 0;
     //get the id
-    m_id = DbManager::getInt(statement, index++);                                           
+    m_id = query.getInt(index++);                                           
     
     //get the name
-    m_name = DbManager::getString(statement, index++);
+    m_name = query.getString(index++);
     
     //get the surname
-    m_surname = DbManager::getString(statement, index++);
+    m_surname = query.getString(index++);
     
     //get the email
-    m_email = DbManager::getString(statement, index++);
+    m_email = query.getString(index++);
   }
-  else
-  {
-    sqlite3_finalize(statement);
-    throw std::runtime_error("Error: no person found with the id: "+std::to_string(id)+"!");
-  }
-
-  //remove the statement
-  sqlite3_finalize(statement);
 }
 /*--------------------------------------------------------------------*/
 void Person::read(const EmailPerson & email)
@@ -131,35 +107,11 @@ void Person::erase()
 {
   if (m_id != 0)
   {
-    //DELETE FROM person WHERE person.idPerson = 2; 
-    //get the database instance
-    sqlite3 *db = DbManager::getConnector();
-
-    //create sql statement
-    sqlite3_stmt *statement;
-    const char* sqlQuery = "DELETE FROM person WHERE person.idPerson = ?";
-    int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
-
-    if (returnCode != SQLITE_OK)
-    {
-      sqlite3_finalize(statement);
-      throw std::runtime_error("Error: prepare statement failed!");
-    }
+    Sql query("DELETE FROM person WHERE person.idPerson = ?");
+  
+    query.bind(m_id, 1);
     
-    //fill the statement with the idPerson 
-    sqlite3_bind_int(statement, 1, m_id);
-    
-    //delete the person
-    returnCode = sqlite3_step(statement);
-    
-    //if we can't delete
-    if( returnCode != SQLITE_DONE)
-    {
-      sqlite3_finalize(statement);
-      throw std::runtime_error("Error: impossible to delete the person with the ID: "+ std::to_string(m_id) +"!");
-    }
-    
-    sqlite3_finalize(statement);
+    query.execQuery();
     
     m_id = 0;
   }
