@@ -41,22 +41,22 @@ Sql::~Sql()
 	sqlite3_finalize(m_pStatement);
 }
 /*--------------------------------------------------------------------*/
-void bind(const std::string & value, uint32_t position)
+void Sql::bind(const std::string & value, uint32_t position)
 {
 	DbManager::bind(m_pStatement, value, position);
 }
 /*--------------------------------------------------------------------*/
-void bind(int value, uint32_t position)
+void Sql::bind(int value, uint32_t position)
 {
 	DbManager::bind(m_pStatement, value, position);
 }
 /*--------------------------------------------------------------------*/
-std::string getString(uint32_t position)
+std::string Sql::getString(uint32_t position)
 {
 	return DbManager::getString(m_pStatement, position);
 }
 /*--------------------------------------------------------------------*/
-int getInt(uint32_t position)
+int Sql::getInt(uint32_t position)
 {
 	return DbManager::getInt(m_pStatement, position);
 }
