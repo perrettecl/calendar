@@ -12,16 +12,19 @@ class Sql
 	//------------- Variables
 private:
 	sqlite3_stmt *m_pStatement;
-	bool m_returnRow;
-	//------------- Functions
 
+	//------------- Functions
 public:
 	Sql(const SqlQuery & query);
-	void execQuery();
-	bool gotRow();
+	bool execQuery();
 	bool nextRow();
-	
 	~Sql();
+
+	void bind(const std::string & value, uint32_t position);
+	void bind(int value, uint32_t position);
+
+	std::string getString(uint32_t position);
+	int getInt(uint32_t position);
 
 private:
 	Sql() = delete;

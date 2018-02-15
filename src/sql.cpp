@@ -1,8 +1,7 @@
 #include "sql.h"
 
 Sql::Sql(const SqlQuery & query) : 
-	m_pStatement(NULL), 
-	m_returnRow(false)
+	m_pStatement(NULL)
 {
 	//get the database instance
 	sqlite3 *pDb = DbManager::getConnector();
@@ -15,7 +14,7 @@ Sql::Sql(const SqlQuery & query) :
 	}
 }
 /*--------------------------------------------------------------------*/
-void Sql::execQuery()
+bool Sql::execQuery()
 {
 	int returnCode = sqlite3_step(m_pStatement);
 	if (returnCode != SQLITE_OK)
@@ -25,23 +24,40 @@ void Sql::execQuery()
 
 	if (returnCode == SQLITE_ROW)
 	{
-		m_returnRow = true;
+		return true;
 	}
-}
-/*--------------------------------------------------------------------*/
-bool Sql::gotRow()
-{
-	return m_returnRow;
+
+	return false;
 }
 /*--------------------------------------------------------------------*/
 bool Sql::nextRow()
 {
-	return true;
+	return execQuery();
 }
 /*--------------------------------------------------------------------*/
 Sql::~Sql()
 {
 	//remove the statement
 	sqlite3_finalize(m_pStatement);
+}
+/*--------------------------------------------------------------------*/
+void bind(const std::string & value, uint32_t position)
+{
+	DbManager::bind(m_pStatement, value, position);
+}
+/*--------------------------------------------------------------------*/
+void bind(int value, uint32_t position)
+{
+	DbManager::bind(m_pStatement, value, position);
+}
+/*--------------------------------------------------------------------*/
+std::string getString(uint32_t position)
+{
+	return DbManager::getString(m_pStatement, position);
+}
+/*--------------------------------------------------------------------*/
+int getInt(uint32_t position)
+{
+	return DbManager::getInt(m_pStatement, position);
 }
 /*--------------------------------------------------------------------*/
