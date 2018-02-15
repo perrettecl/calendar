@@ -45,13 +45,18 @@ void Person::read(IdPerson id)
   //if we found a person with this id
   if( returnCode == SQLITE_ROW)
   {  
-    //get the id                                            
-    m_id = sqlite3_column_int(statement, 0);
+    int index = 0;
+    //get the id
+    m_id = DbManager::getInt(statement, index++);                                           
     
     //get the name
-    std::stringstream stream;
-    stream << sqlite3_column_text(statement, 1);
-    m_name = stream.str();
+    m_name = DbManager::getString(statement, index++);
+    
+    //get the surname
+    m_surname = DbManager::getString(statement, index++);
+    
+    //get the email
+    m_email = DbManager::getString(statement, index++);
   }
   else
   {
@@ -168,7 +173,7 @@ void Person::insert()
 
   //create sql statement
   sqlite3_stmt *statement;
-  const char* sqlQuery = "INSERT INTO person (name) VALUES (?)";
+  const char* sqlQuery = "INSERT INTO person (name, surname, email) VALUES (?, ?, ?)";
   int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
 
   if (returnCode != SQLITE_OK)
@@ -177,8 +182,16 @@ void Person::insert()
     throw std::runtime_error("Error: prepare statement failed!");
   }
   
+  int index = 1;
+  
   //fill the statement with the name
-  sqlite3_bind_text(statement, 1, m_name.c_str(), m_name.length(),SQLITE_STATIC);
+  DbManager::bind(statement, m_name, index++);
+  
+  //fill the statement with the surname
+  DbManager::bind(statement, m_surname, index++);
+  
+  //fill the statement with the email
+  DbManager::bind(statement, m_email, index++);
   
   //insert the person
   returnCode = sqlite3_step(statement);
@@ -206,7 +219,7 @@ void Person::update()
 
   //create sql statement
   sqlite3_stmt *statement;
-  const char* sqlQuery = "UPDATE person SET name = ? WHERE person.idPerson = ?";
+  const char* sqlQuery = "UPDATE person SET name = ?, surname = ?, email = ? WHERE person.idPerson = ?";
   int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
 
   if (returnCode != SQLITE_OK)
@@ -215,11 +228,17 @@ void Person::update()
     throw std::runtime_error("Error: prepare statement failed!");
   }
   
-  //fill the statement with the name 
-  sqlite3_bind_text(statement, 1, m_name.c_str(), m_name.length(),SQLITE_STATIC);
-  //fill the statement with the idPerson 
-  sqlite3_bind_int(statement, 2, m_id);
+  int index = 1;
   
+  //fill the statement with the name 
+  DbManager::bind(statement, m_name, index++);
+  
+  //fill the statement with the surname 
+  DbManager::bind(statement, m_surname, index++);
+  
+  //fill the statement with the email 
+  DbManager::bind(statement, m_email, index++);
+    
   //insert the person
   returnCode = sqlite3_step(statement);
   
@@ -245,12 +264,36 @@ NamePerson Person::getName() const
 }
 /*--------------------------------------------------------------------*/
 std::ostream& operator<<(std::ostream &strm, const Person &person) {
-  return strm << "Person(namePerson = " << person.getName() << ", ID = " << person.getId() << ")" << std::endl;
+  return strm << "Person(name = " << person.getName()
+    << ", surname = " << person.getSurname()
+    << ", email = " << person.getEmail()
+    << ", ID = " << person.getId()
+    << ")" << std::endl;
 }
 /*--------------------------------------------------------------------*/
 void Person::setName(const NamePerson & name)
 {
   m_name = name;
+}
+/*--------------------------------------------------------------------*/
+SurnamePerson Person::getSurname() const
+{
+  return m_surname;
+}
+/*--------------------------------------------------------------------*/
+void Person::setSurname(const SurnamePerson & surname)
+{
+  m_surname = surname;
+}
+/*--------------------------------------------------------------------*/
+EmailPerson Person::getEmail() const
+{
+  return m_email;
+}
+/*--------------------------------------------------------------------*/
+void Person::setEmail(const EmailPerson & email)
+{
+  m_email = email;
 }
 /*--------------------------------------------------------------------*/
 void Person::printAll()
@@ -260,7 +303,7 @@ void Person::printAll()
 
   //create sql statement
   sqlite3_stmt *res;
-  int rc = sqlite3_prepare_v2(db, "SELECT person.idPerson, person.name FROM PERSON", -1, &res, 0);
+  int rc = sqlite3_prepare_v2(db, "SELECT person.idPerson, person.name, person.surname, person.email FROM PERSON", -1, &res, 0);
 
   if (rc != SQLITE_OK)
   {
@@ -269,9 +312,12 @@ void Person::printAll()
 
   //read the answer
   while ((rc = sqlite3_step(res)) == SQLITE_ROW)
-  {                                              
-    std::cout << sqlite3_column_int(res, 0) << " - ";
-    std::cout << sqlite3_column_text(res, 1) << std::endl;
+  {
+    int index = 0;                                             
+    std::cout << sqlite3_column_int(res, index++) << " - ";
+    std::cout << sqlite3_column_text(res, index++) << " ";
+    std::cout << sqlite3_column_text(res, index++) << ", ";
+    std::cout << sqlite3_column_text(res, index++) << std::endl;
   }
 
   //remove the statement
