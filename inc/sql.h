@@ -26,6 +26,8 @@ public:
 	std::string getString(uint32_t position);
 	int getInt(uint32_t position);
 
+	static uint32_t lastInsertId();
+
 private:
 	Sql() = delete;
 	Sql(DbManager const&) = delete;

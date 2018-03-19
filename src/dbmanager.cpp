@@ -17,7 +17,6 @@ DbManager::DbManager()
     {
        throw std::runtime_error("Error: connection with database failed!");
     }
-
 }
 /*--------------------------------------------------------------------*/
 sqlite3* DbManager::getConnector()
