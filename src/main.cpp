@@ -1,17 +1,26 @@
 #include <iostream>
 #include "person.h"
+#include "event.h"
 #include "sql.h"
+#include "sqlerror.h"
 
 
 int main()//(int argc, char *argv[])
 {
-    std::cout << "Hello World!" << std::endl;
-    Person::printAll();
-    Person person(1);
-	//Sql sql("Select * From Person");
-    std::cout << person.getName() << std::endl;
-    std::cout << person;
-    char test;
-    std::cin >> test;
+	try
+	{
+		std::cout << "Hello World!" << std::endl;
+		Event::printAll();
+		//Event::write();
+		//Event::update(4);
+		Event::erase(5);
+		
+	}
+	catch (SqlError & e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	char test;
+	std::cin >> test;
     return 0;
 }
