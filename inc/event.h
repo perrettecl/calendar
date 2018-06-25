@@ -25,18 +25,19 @@ private:
 	UntilEvent m_until;
 	TextEvent m_text;
 
-	//object methodes
+	//object methods
 public:
-	/**
-	* @brief Create a new event.
-	* @param in: name of the event
+
+	/*
+	@brief Create a new Event object
+	@param in: title, from, until, text
 	*/
-	Event(const TitleEvent & name);
+	Event(const TitleEvent & title, const FromEvent & from, const UntilEvent & until, const TextEvent & text);
+
 
 	/**
-	* @brief Load an event from the database
+	* @brief Load an event by its id
 	* @param in: id of the event in the database
-	* @exception runtime_error when the id doesn't exist
 	*/
 	Event(IdEvent id);
 
@@ -50,19 +51,35 @@ public:
 	* @brief write an event into the database. If the id is empty,
 	* we insert the event, otherwise we update the field
 	*/
-	void write();
+	//void write();
+
+	//void erase();
 
 	IdEvent getId() const;
 
-	TitleEvent getName() const;
+	TitleEvent getTitle() const;
 	void setTitle(const TitleEvent & title);
 
+	FromEvent getFrom() const;
+	void setFrom(const FromEvent & from);
+
+	UntilEvent getUntil() const;
+	void setUntil(const UntilEvent & until);
+
+	TextEvent getText() const;
+	void setText(const TextEvent & text);
+
+private: 
+	void insert();
+	//void update(int idEvent);
 
 
-
-	//static methodes
+	//static methods
 public:
 	static void printAll();
+	static void write();
+	static void update(int idEvent);
+	static void erase(int idEvent);
 };
 
 std::ostream& operator<<(std::ostream &strm, const Event &event);

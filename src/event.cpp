@@ -1,10 +1,10 @@
 #include "event.h"
-#include "dbmanager.h"
+#include "sql.h"
 #include <iostream>
 #include <sstream>
 
-Event::Event(const TitleEvent & title)
-	: m_id(0), m_title(title)
+Event::Event(const TitleEvent & title, const FromEvent & from, const UntilEvent & until, const TextEvent & text)
+	: m_id(0), m_title(title), m_from(from), m_until(until), m_text(text)
 {
 
 }
@@ -16,90 +16,124 @@ Event::Event(IdEvent id)
 
 void Event::read(IdEvent id)
 {
-	//get the database instance
-	sqlite3 *db = DbManager::getConnector();
-
-	//create sql statement
-	sqlite3_stmt *statement;
-	const char* sqlQuery = "SELECT event.idEvent, event.title FROM event WHERE event.idEvent = ?";
-	int returnCode = sqlite3_prepare_v2(db, sqlQuery, -1, &statement, 0);
-
-	if (returnCode != SQLITE_OK)
-	{
-		throw std::runtime_error("Error: prepare statement failed!");
-	}
-
-	//fill the statement with the idEvent 
-	sqlite3_bind_int(statement, 1, id);
-
-	//read the first answer
-	returnCode = sqlite3_step(statement);
+	Sql query = "SELECT event.idEvent, event.title FROM event WHERE event.idEvent = ?";
+	query.bind(id,1);
 
 	//if we found a person with this id
-	if (returnCode == SQLITE_ROW)
+	if (query.execQuery())
 	{
-		//get the id                                            
-		m_id = sqlite3_column_int(statement, 0);
+		int index = 0;
 
-		//get the name
-		std::stringstream stream;
-		stream << sqlite3_column_text(statement, 1);
-		m_title = stream.str();
-	}
-	else
-	{
-		sqlite3_finalize(statement);
-		throw std::runtime_error("Error: no event found with the id: " + std::to_string(id) + "!");
-	}
+		m_id = query.getInt(index++);
 
-	//remove the statement
-	sqlite3_finalize(statement);
+		m_title = query.getString(index++);
+
+		m_from = query.getInt(index++);
+
+		m_until = query.getInt(index++);
+
+		m_text = query.getString(index++);
+	}
 }
 /*--------------------------------------------------------------------*/
 void Event::write()
 {
+	Sql query = "INSERT INTO event (title, `from`, until, text) VALUES (?,?,?,?)";
+	std::string test = "test title";
+	std::string testtext = "test text";
+	query.bind(test, 1);
+	query.bind(12, 2);
+	query.bind(24, 3);
+	query.bind(testtext, 4);
+
+	query.execQuery();
+
 }
+
+void Event::update(int idEvent)
+{
+	Sql query = "UPDATE event SET title = ?, `from` = ?, until = ?, text = ? WHERE idEvent = ?";
+
+	std::string testUpdate = "test update";
+	std::string testtextUpdate = "test text update";
+
+	query.bind(testUpdate, 1);
+	query.bind(11, 2);
+	query.bind(25, 3);
+	query.bind(testtextUpdate, 4);
+	query.bind(idEvent, 5);
+
+	query.execQuery();
+}
+
+void Event::erase(int idEvent)
+{
+	Sql query = "DELETE FROM event WHERE idEvent = ?";
+	
+	query.bind(idEvent, 1);
+
+	query.execQuery();
+
+}
+
+/*--------------------------------------------------------------------*/
+std::ostream& operator<<(std::ostream &strm, const Event &event) {
+	return strm << "Event(nameEvent = " << event.getTitle() << ", ID = " << event.getId() << ")" << std::endl;
+}
+
 /*--------------------------------------------------------------------*/
 IdEvent Event::getId() const
 {
 	return m_id;
 }
-/*--------------------------------------------------------------------*/
-TitleEvent Event::getName() const
+
+TitleEvent Event::getTitle() const
 {
 	return m_title;
 }
-/*--------------------------------------------------------------------*/
-std::ostream& operator<<(std::ostream &strm, const Event &event) {
-	return strm << "Event(nameEvent = " << event.getName() << ", ID = " << event.getId() << ")" << std::endl;
-}
-/*--------------------------------------------------------------------*/
+
 void Event::setTitle(const TitleEvent & title)
 {
 	m_title = title;
 }
-/*--------------------------------------------------------------------*/
+
+FromEvent Event::getFrom() const
+{
+	return m_from;
+}
+
+void Event::setFrom(const FromEvent & from)
+{
+	m_from = from;
+}
+
+UntilEvent Event::getUntil() const
+{
+	return m_until;
+}
+
+void Event::setText(const TextEvent & text)
+{
+	m_text = text;
+}
+
+TextEvent Event::getText() const
+{
+	return m_text;
+}
+
 void Event::printAll()
 {
-	//get the database instance
-	sqlite3 *db = DbManager::getConnector();
+	Sql query = "SELECT event.idEvent, event.title FROM event";
 
-	//create sql statement
-	sqlite3_stmt *res;
-	int rc = sqlite3_prepare_v2(db, "SELECT event.idEvent, event.title FROM event", -1, &res, 0);
-
-	if (rc != SQLITE_OK)
+	while (query.nextRow())
 	{
-		throw std::runtime_error("Error: prepare statement failed!");
-	}
+		int index = 0;
 
-	//read the answer
-	while ((rc = sqlite3_step(res)) == SQLITE_ROW)
-	{
-		std::cout << sqlite3_column_int(res, 0) << " - ";
-		std::cout << sqlite3_column_text(res, 1) << std::endl;
-	}
+		std::cout << query.getInt(index++);
+		std::cout << " - ";
+		std::cout << query.getString(index++) << std::endl;
 
-	//remove the statement
-	sqlite3_finalize(res);
+	}
+	
 }
