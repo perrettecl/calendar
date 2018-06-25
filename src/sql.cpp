@@ -1,5 +1,7 @@
 #include "sql.h"
+#include "sqlerror.h"
 #include <stdexcept>
+
 
 Sql::Sql(const SqlQuery & query) : 
 	m_pStatement(NULL)
@@ -11,14 +13,14 @@ Sql::Sql(const SqlQuery & query) :
 	//create the statemment
 	if (returnCode != SQLITE_OK)
 	{
-		throw std::runtime_error("Error: prepare statement failed!");
+		throw SqlError(returnCode);
 	}
 }
 /*--------------------------------------------------------------------*/
 bool Sql::execQuery()
 {
 	int returnCode = sqlite3_step(m_pStatement);
-	if (returnCode != SQLITE_OK && returnCode != SQLITE_ROW)
+	if (!(returnCode == SQLITE_OK || returnCode == SQLITE_ROW || returnCode == SQLITE_DONE))
 	{
 		throw std::runtime_error("Error: exec statement failed!");
 	}

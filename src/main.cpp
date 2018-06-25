@@ -1,20 +1,25 @@
 #include <iostream>
 #include "person.h"
-<<<<<<< HEAD
 #include "sql.h"
-=======
 #include "event.h"
->>>>>>> 57a08ee... Event class implementation
+#include "sqlerror.h"
 
 
 int main()//(int argc, char *argv[])
 {
-    std::cout << "Hello World!" << std::endl;
-    Person::printAll();
-    Person person(1);
-    std::cout << person.getName() << std::endl;
-    std::cout << person;
-    char test;
-    std::cin >> test;
+	try
+	{
+        std::cout << "Hello World!" << std::endl;
+        Person::printAll();
+        Person person(1);
+        std::cout << person.getName() << std::endl;
+        std::cout << person;		
+	}
+	catch (SqlError & e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	char test;
+	std::cin >> test;
     return 0;
 }
