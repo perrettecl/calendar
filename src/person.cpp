@@ -138,7 +138,7 @@ void Person::update()
   query.bind(m_email, index++);
     
   query.execQuery();
-
+}
 /*--------------------------------------------------------------------*/
 IdPerson Person::getId() const
 {
@@ -150,7 +150,8 @@ NamePerson Person::getName() const
   return m_name;
 }
 /*--------------------------------------------------------------------*/
-std::ostream& operator<<(std::ostream &strm, const Person &person) {
+std::ostream& operator<<(std::ostream &strm, const Person &person) 
+{
   return strm << "Person(name = " << person.getName()
     << ", surname = " << person.getSurname()
     << ", email = " << person.getEmail()
