@@ -18,6 +18,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #add some define for the compilation of sqlite
 add_definitions(-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
 
+#check cpp rest sdk installed
+find_package(cpprestsdk REQUIRED)
+
 #get the sources
 FILE(GLOB_RECURSE sources_files "src/*.c*")
 FILE(GLOB_RECURSE headers_files "inc/*.h")
@@ -27,8 +30,13 @@ message(STATUS "My headers:  ${headers_files}")
 #add the includes
 INCLUDE_DIRECTORIES("inc")
 
-#creat the executable output
+#create the executable output
 add_executable(Calendar ${sources_files})
 
 #add external lib if needed
-#target_link_libraries(Calendar pthread dl)
+target_link_libraries(Calendar PRIVATE cpprestsdk::cpprest
+  boost_system-mt
+  boost_thread-mt
+  boost_chrono-mt
+)
+
