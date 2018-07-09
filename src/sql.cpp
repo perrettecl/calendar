@@ -64,3 +64,11 @@ int Sql::getInt(uint32_t position)
 	return DbManager::getInt(m_pStatement, position);
 }
 /*--------------------------------------------------------------------*/
+uint32_t Sql::lastInsertId()
+{
+	//get the database instance
+	sqlite3 *pDb = DbManager::getConnector();
+
+	return sqlite3_last_insert_rowid(pDb);
+}
+/*--------------------------------------------------------------------*/
